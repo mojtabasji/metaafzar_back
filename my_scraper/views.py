@@ -70,7 +70,6 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
-
 class UserLoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     def post(self, request):
@@ -98,6 +97,67 @@ class UserLoginView(generics.GenericAPIView):
             else:
                 return Response({"error": "Invalid username or password"}, status=400)
 
+class UserIGPageListView(generics.ListAPIView):
+    serializer_class = IGPageSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        return IGPage.objects.filter(user=user)
+
+    def get(self, request):
+        igpages = self.get_queryset()
+        serializer = IGPageSerializer(igpages, many=True)
+        return Response(serializer.data)
+
+# authentication check endpoint
+class UserAuthCheckView(generics.GenericAPIView):
+    permission_classes = [IsAuthenticated]
+    # no need to serializer class here, just return user info if authenticated
+    def get_serializer_class(self):
+        return None
+
+    def get(self, request):
+        user = request.user
+        if user.is_authenticated:
+            return Response({"message": "User is authenticated", "username": user.username}, status=status.HTTP_200_OK)
+        return Response({"error": "User is not authenticated"}, status=status.HTTP_401_UNAUTHORIZED)
+
+class UserRegisterView(generics.CreateAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [AllowAny]
+    parser_classes = [FormParser, MultiPartParser]
+    # remove some fields from the serializer
+    def get_serializer(self, *args, **kwargs):
+        serializer = super().get_serializer(*args, **kwargs)
+        serializer.fields.pop('last_login', None)
+        serializer.fields.pop('is_active', None)
+        serializer.fields.pop('is_staff', None)
+        serializer.fields.pop('is_superuser', None)
+        serializer.fields.pop('date_joined', None)
+        serializer.fields.pop('groups', None)
+        serializer.fields.pop('user_permissions', None)
+        serializer.fields.pop('role', None)
+        serializer.fields.pop('profile_picture', None)
+        return serializer
+
+    def post(self, request):
+        serializer = UserSerializer(data=request.data)
+        if serializer.is_valid():
+            user = serializer.save()
+            # Automatically log in the user after registration
+            refresh = RefreshToken.for_user(user)
+            response = Response({
+                'refresh': str(refresh),
+                'access': str(refresh.access_token),
+                "message": "Registration successful", "user": user.username}, status=status.HTTP_201_CREATED)
+            # Set tokens in cookies
+            response.set_cookie('refresh_token', str(refresh), httponly=True)
+            response.set_cookie('access_token', str(refresh.access_token), httponly=True)
+
+            return response
+        return Response(serializer.errors, status=400)
+
 class UserLogoutView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [IsAuthenticated]
@@ -124,13 +184,34 @@ class IGPageListView(generics.ListCreateAPIView):
         return Response(serializer.errors, status=400)
 
 class AttachNewIGPageView(generics.GenericAPIView):
-    serializer_class = IGPageSerializer
     permission_classes = [IsAuthenticated]
+    # no need to serializer class here,
+    def get_serializer_class(self):
+        return None
 
     def get(self, request):
         user = request.user
         # get page details and tokens and add to user pages    #todo
-
+        print("User is authenticated:", user.is_authenticated)
+        print("request parameters:", request.query_params)
+        ig_username = request.query_params.get('username')
+        access_token = request.query_params.get('access_token')
+        if not ig_username or not access_token:
+            return Response({"error": "Instagram username and access token are required"}, status=400)
+        # Check if the user already has an IGPage with this username
+        if IGPage.objects.filter(username=ig_username, user=user).exists():
+            # update the existing IGPage
+            igpage = IGPage.objects.get(username=ig_username, user=user)
+            igpage.token = access_token
+            igpage.save()
+            return Response({"message": "Instagram page updated successfully", "igpage": IGPageSerializer(igpage).data}, status=200)
+        # Create a new IGPage for the user
+        igpage = IGPage.objects.create(
+            username=ig_username,
+            token=access_token,
+            user=user
+        )
+        return Response({"message": "Instagram page attached successfully", "igpage": IGPageSerializer(igpage).data}, status=201)
 
 class IGPageDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = IGPageSerializer

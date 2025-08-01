@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
+from env import my_env
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -19,12 +20,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure-uw(g2mj1g%0kl9$d5(yzvf+v32=&#y40=!g)=i4hym+v!vdk%b'
+SECRET_KEY = my_env.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = my_env.DEBUG
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = my_env.ALLOWED_HOSTS
 
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
@@ -62,7 +63,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'metaafzar.urls'
+ROOT_URLCONF = my_env.ROOT_URLCONF
 
 TEMPLATES = [
     {
@@ -83,13 +84,37 @@ WSGI_APPLICATION = 'metaafzar.wsgi.application'
 
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
+# # Uncomment and configure the following for production database settings
+# if my_env.ENVIRONMENT == 'production':
+#     DATABASES = {
+#         'default': {
+#             'ENGINE': my_env.DATABASE_ENGINE,
+#             'NAME': my_env.DATABASE_NAME,
+#             'USER': my_env.DATABASE_USER,
+#             'PASSWORD': my_env.DATABASE_PASSWORD,
+#             'HOST': my_env.DATABASE_HOST,
+#             'PORT': my_env.DATABASE_PORT,
+#         }
+#     }
 
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+if my_env.DATABASE_ENGINE == 'django.db.backends.sqlite3':
+    DATABASES = {
+        'default': {
+            'ENGINE': my_env.DATABASE_ENGINE,
+            'NAME': BASE_DIR / my_env.DATABASE_NAME,
+        }
     }
-}
+else:
+    DATABASES = {
+        'default': {
+            'ENGINE': my_env.DATABASE_ENGINE,
+            'NAME': my_env.DATABASE_NAME,
+            'USER': my_env.DATABASE_USER,
+            'PASSWORD': my_env.DATABASE_PASSWORD,
+            'HOST': my_env.DATABASE_HOST,
+            'PORT': my_env.DATABASE_PORT,
+        }
+    }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators

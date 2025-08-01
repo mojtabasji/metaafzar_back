@@ -21,9 +21,13 @@ urlpatterns = [
     path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
     path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
     path('users', views.UserListView.as_view()),
+    path('users/register', views.UserRegisterView.as_view()),
     path('users/<int:id>', views.UserDetailView.as_view()),
     path('users/login', views.UserLoginView.as_view()),
+    path('users/auth_check', views.UserAuthCheckView.as_view()),
     path('users/logout', views.UserLogoutView.as_view()),
+    path('users/igpages', views.UserIGPageListView.as_view()),
+    path('users/attach_igpage', views.AttachNewIGPageView.as_view()),
     path('igpages', views.IGPageListView.as_view()),
     path('igpages/<int:id>', views.IGPageDetailView.as_view()),
 ]
