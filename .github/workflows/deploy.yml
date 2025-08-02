@@ -34,7 +34,7 @@ jobs:
         echo "$SSH_PRIVATE_KEY" | tr -d '\r' | ssh-add -
 
         # Deploy commands
-        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP << 'EOF'
+        ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP -p 8922 << 'EOF'
           if pgrep -f "python manage.py startserver 8950" > /dev/null; then
               echo "Process is running, stopping it..."
               pkill -f "python manage.py startserver 8950"
