@@ -10,7 +10,7 @@ class Env:
 
     SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
     DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '')
     DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
     API_VERSION = os.getenv('API_VERSION', 'v1')
     ROOT_URLCONF = os.getenv('ROOT_URLCONF', 'metaafzar.urls')
@@ -25,3 +25,18 @@ class Env:
 
 my_env = Env("development")  # Change to "production" or "staging" as needed
 
+if __name__ == "__main__":
+    print("Environment Configuration:")
+    print(f"ENVIRONMENT: {my_env.ENVIRONMENT}")
+    print(f"SECRET_KEY: {my_env.SECRET_KEY}")
+    print(f"DEBUG: {my_env.DEBUG}")
+    print(f"ALLOWED_HOSTS: {my_env.ALLOWED_HOSTS}")
+    print(f"DATABASE_URL: {my_env.DATABASE_URL}")
+    print(f"API_VERSION: {my_env.API_VERSION}")
+    print(f"ROOT_URLCONF: {my_env.ROOT_URLCONF}")
+    print(f"DATABASE_NAME: {my_env.DATABASE_NAME}")
+    print(f"DATABASE_ENGINE: {my_env.DATABASE_ENGINE}")
+    print(f"DATABASE_USER: {my_env.DATABASE_USER}")
+    print(f"DATABASE_PASSWORD: {my_env.DATABASE_PASSWORD}")
+    print(f"DATABASE_HOST: {my_env.DATABASE_HOST}")
+    print(f"DATABASE_PORT: {my_env.DATABASE_PORT}")
