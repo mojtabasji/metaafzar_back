@@ -18,10 +18,10 @@ jobs:
       with:
         python-version: '3.13'  # Specify your Python version
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
+#    - name: Install dependencies    # this will be used on  containerized deployment
+#      run: |
+#        python -m pip install --upgrade pip
+#        pip install -r requirements.txt
 
     - name: Deploy to server
       env:
