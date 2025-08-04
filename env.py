@@ -10,7 +10,7 @@ class Env:
 
     SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
     DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
-    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '')
+    ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
     DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
     API_VERSION = os.getenv('API_VERSION', 'v1')
     ROOT_URLCONF = os.getenv('ROOT_URLCONF', 'metaafzar.urls')
