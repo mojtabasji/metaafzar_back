@@ -42,12 +42,12 @@ jobs:
               echo "Process is not running."
           fi
           cd /opt/metaafzar
-          python -m venv venv
+          python3 -m venv venv
           source venv/bin/activate  
           cd /opt/metaafzar/deploy  
           git pull origin production
           pip install -r requirements.txt
           python manage.py migrate
           python manage.py collectstatic --noinput
-          python manage.py startserver 8950 &
+          python manage.py startserver 8930 &
         EOF

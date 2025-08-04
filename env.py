@@ -3,12 +3,15 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
+
 class Env:
+    def __init__(self, environment="development"):
+        self.ENVIRONMENT = os.getenv('ENVIRONMENT', environment)
+
     SECRET_KEY = os.getenv('SECRET_KEY', 'default-secret-key')
     DEBUG = os.getenv('DEBUG', 'True').lower() in ['true', '1', 'yes']
     ALLOWED_HOSTS = os.getenv('ALLOWED_HOSTS', '').split(',')
     DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
-    ENVIRONMENT = os.getenv('ENVIRONMENT', 'development')
     API_VERSION = os.getenv('API_VERSION', 'v1')
     ROOT_URLCONF = os.getenv('ROOT_URLCONF', 'metaafzar.urls')
     DATABASE_URL = os.getenv('DATABASE_URL', 'sqlite:///db.sqlite3')
