@@ -55,6 +55,6 @@ jobs:
           python manage.py migrate
           python manage.py collectstatic --noinput
           # create a superuser if it doesn't exist with password 'admin'
-          echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.get_or_create(username=${{ secrets.DJUSER }}, defaults={'password': $DJUSERPASS})" | python manage.py shell 
+          echo "from django.contrib.auth import get_user_model; User = get_user_model(); User.objects.get_or_create(username=${{ secrets.DJUSER }}, defaults={'password': ${{ secrets.DJUSERPASS }}})" | python manage.py shell 
           python manage.py runserver 8930 &
         EOF
