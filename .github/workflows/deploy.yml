@@ -40,7 +40,7 @@ jobs:
         echo "DJUSERPASS: ${{ secrets.DJUSERPASS }}"
         # Deploy commands
         ssh -o StrictHostKeyChecking=no $SERVER_USER@$SERVER_IP -p 8922 << 'EOF'
-          if pgrep -f "python manage.py startserver 8950" > /dev/null; then
+          if pgrep -f "python manage.py startserver 8930" > /dev/null; then
               echo "Process is running, stopping it..."
               pkill -f "python manage.py startserver 8950"
           else
