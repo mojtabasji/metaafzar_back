@@ -20,6 +20,7 @@ from rest_framework import routers, serializers, viewsets
 
 
 urlpatterns = [
+    path('', admin.site.urls),
     path('admin/', admin.site.urls),
     path('api/', include('my_scraper.urls')),
     path('api-auth/', include('rest_framework.urls')),
