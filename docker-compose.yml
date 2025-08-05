@@ -8,7 +8,7 @@ services:
 
     volumes:
       - ./data:/app/data
-      - /DB/db.sqlite3:/app/db.sqlite3
+      - /DB:/app/DB
     networks:
       - web_net
 
