@@ -25,6 +25,11 @@ SECRET_KEY = my_env.SECRET_KEY
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = my_env.DEBUG
 
+if not DEBUG:
+    SWAGGER_SETTINGS = {
+        'DEFAULT_API_URL': 'https://metaafzar.bytecraft.ir/',
+    }
+
 ALLOWED_HOSTS = my_env.ALLOWED_HOSTS
 
 REST_FRAMEWORK = {

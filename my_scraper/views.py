@@ -5,6 +5,9 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
 
+from drf_yasg.utils import swagger_auto_schema
+from drf_yasg import openapi
+
 from my_scraper.models import User, IGPage
 from my_scraper.serializers import UserSerializer, IGPageSerializer, LoginSerializer
 
@@ -19,12 +22,33 @@ class UserListView(generics.ListCreateAPIView):
             return [IsAuthenticated()]
         return [AllowAny()]
 
+    @swagger_auto_schema(
+        operation_description="List all users or create a new user",
+        responses={
+            200: UserSerializer(many=True),
+            201: UserSerializer,
+            204: "No Content"
+        }
+    )
     def get(self, request):
         # just authenticated users can access this view
         users = User.objects.all()
         serializer = UserSerializer(users, many=True)
         return Response(serializer.data)
 
+    @swagger_auto_schema(
+        operation_description="Create a new user, some parameters should be add.",
+        manual_parameters=[
+            openapi.Parameter('username', openapi.IN_QUERY, description="Username of the user",
+                              type=openapi.TYPE_STRING),
+            openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user",
+                              type=openapi.TYPE_STRING)
+        ],
+        responses={
+            201: UserSerializer,
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
