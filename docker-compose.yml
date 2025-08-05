@@ -9,6 +9,7 @@ services:
     volumes:
       - ./data:/app/data
       - ./DB:/app/DB
+      - ./logs:/app/logs
     networks:
       - web_net
 
