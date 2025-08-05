@@ -14,10 +14,5 @@ services:
 
 networks:
   web_net:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: web_net
-      com.docker.network.bridge.enable_icc: "true"
-
-
+    external: true
 
