@@ -15,6 +15,7 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
 from my_scraper import components
@@ -25,4 +26,6 @@ urlpatterns = [
     path('administration/', admin.site.urls),
     path('api/', include('my_scraper.urls')),
     path('api-auth/', include('rest_framework.urls')),
+    path('accounts/login/', auth_views.LoginView.as_view(), name='login'),
+    path('accounts/logout/', auth_views.LogoutView.as_view(), name='logout'),
 ]

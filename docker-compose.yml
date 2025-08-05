@@ -10,6 +10,7 @@ services:
       - ./data:/app/data
       - ./DB:/app/DB
       - ./logs:/app/logs
+      - ./static:/app/staticfiles
     networks:
       - web_net
 
