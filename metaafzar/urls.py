@@ -17,11 +17,12 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import include, path
 from rest_framework import routers, serializers, viewsets
+from my_scraper import components
 
 
 urlpatterns = [
-    path('', admin.site.urls),
-    path('admin/', admin.site.urls),
+    path('', components.nothing_to_show, name='nothing-to-show'),
+    path('administration/', admin.site.urls),
     path('api/', include('my_scraper.urls')),
     path('api-auth/', include('rest_framework.urls')),
 ]
