@@ -1,0 +1,23 @@
+services:
+  metaafzar_back_service:
+    image: metaafzar_back:1.0
+    ports:
+      - "8930:8930"
+    env_file:
+      - .env
+
+    volumes:
+      - ./data:/app/data
+      - /DB/db.sqlite3:/app/db.sqlite3
+    networks:
+      - web_net
+
+networks:
+  web_net:
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.name: web_net
+      com.docker.network.bridge.enable_icc: true
+
+
+
