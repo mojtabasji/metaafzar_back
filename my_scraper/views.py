@@ -267,10 +267,6 @@ class UserLogoutView(generics.GenericAPIView):
 
     @swagger_auto_schema(
         operation_description="Log out the user",
-        manual_parameters=[
-            openapi.Parameter('refresh_token', openapi.IN_COOKIE, description="Refresh token to log out", type=openapi.TYPE_STRING),
-            openapi.Parameter('access_token', openapi.IN_COOKIE, description="Access token to log out", type=openapi.TYPE_STRING)
-        ],
         responses={
             200: "Logged out successfully",
             401: "Unauthorized"
