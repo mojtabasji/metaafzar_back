@@ -15,7 +15,7 @@ from my_scraper.serializers import UserSerializer, IGPageSerializer, LoginSerial
 class UserListView(generics.ListCreateAPIView):
     serializer_class = UserSerializer
     queryset = User.objects.all()
-    parser_classes = [FormParser, MultiPartParser]
+    # parser_classes = [FormParser, MultiPartParser]
 
     def get_permissions(self):
         if self.request.method == 'DELETE':
@@ -41,8 +41,14 @@ class UserListView(generics.ListCreateAPIView):
         manual_parameters=[
             openapi.Parameter('username', openapi.IN_QUERY, description="Username of the user",
                               type=openapi.TYPE_STRING),
+            openapi.Parameter('email', openapi.IN_QUERY, description="Email of the user",
+                              type=openapi.TYPE_STRING),
+            openapi.Parameter('first_name', openapi.IN_QUERY, description="First name of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('last_name', openapi.IN_QUERY, description="Last name of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('phone', openapi.IN_QUERY, description="Phone number of the user", type=openapi.TYPE_STRING),
             openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user",
-                              type=openapi.TYPE_STRING)
+                              type=openapi.TYPE_STRING),
+            openapi.Parameter('confirm_password', openapi.IN_QUERY, description="Confirm password of the user",)
         ],
         responses={
             201: UserSerializer,
@@ -67,6 +73,17 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = UserSerializer
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Get, update or delete a user by ID",
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_PATH, description="ID of the user", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            200: UserSerializer,
+            404: "User not found",
+            400: "Bad Request"
+        }
+    )
     def get(self, request, id):
         try:
             user = User.objects.get(id=id)
@@ -75,6 +92,25 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
+    @swagger_auto_schema(
+        operation_description="Update a user by ID",
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_PATH, description="ID of the user", type=openapi.TYPE_INTEGER),
+            openapi.Parameter('username', openapi.IN_QUERY, description="Username of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('email', openapi.IN_QUERY, description="Email of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('first_name', openapi.IN_QUERY, description="First name of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('last_name', openapi.IN_QUERY, description="Last name of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('phone', openapi.IN_QUERY, description="Phone number of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('confirm_password', openapi.IN_QUERY, description="Confirm password of the user", type=openapi.TYPE_STRING)
+        ],
+        request_body=UserSerializer,
+        responses={
+            200: UserSerializer,
+            404: "User not found",
+            400: "Bad Request"
+        }
+    )
     def put(self, request, id):
         try:
             user = User.objects.get(id=id)
@@ -86,6 +122,17 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
         except User.DoesNotExist:
             return Response({"error": "User not found"}, status=404)
 
+
+    @swagger_auto_schema(
+        operation_description="Delete a user by ID",
+        manual_parameters=[
+            openapi.Parameter('id', openapi.IN_PATH, description="ID of the user", type=openapi.TYPE_INTEGER)
+        ],
+        responses={
+            204: "No Content",
+            404: "User not found"
+        }
+    )
     def delete(self, request, id):
         try:
             user = User.objects.get(id=id)
@@ -96,6 +143,18 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
 
 class UserLoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+
+    @swagger_auto_schema(
+        operation_description="Login a user",
+        manual_parameters=[
+            openapi.Parameter('username', openapi.IN_QUERY, description="Username of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user", type=openapi.TYPE_STRING)
+        ],
+        responses={
+            200: openapi.Response(description="Login successful", examples={"application/json": {"refresh": "token", "access": "token", "message": "Login successful", "user": "username"}}),
+            400: "Invalid username or password"
+        }
+    )
     def post(self, request):
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
@@ -141,6 +200,13 @@ class UserAuthCheckView(generics.GenericAPIView):
     def get_serializer_class(self):
         return None
 
+    @swagger_auto_schema(
+        operation_description="Check if the user is authenticated",
+        responses={
+            200: openapi.Response(description="User is authenticated", examples={"application/json": {"message": "User is authenticated", "username": "example_user"}}),
+            401: "User is not authenticated"
+        }
+    )
     def get(self, request):
         user = request.user
         if user.is_authenticated:
@@ -150,7 +216,7 @@ class UserAuthCheckView(generics.GenericAPIView):
 class UserRegisterView(generics.CreateAPIView):
     serializer_class = UserSerializer
     permission_classes = [AllowAny]
-    parser_classes = [FormParser, MultiPartParser]
+    # parser_classes = [FormParser, MultiPartParser]
     # remove some fields from the serializer
     def get_serializer(self, *args, **kwargs):
         serializer = super().get_serializer(*args, **kwargs)
@@ -165,6 +231,22 @@ class UserRegisterView(generics.CreateAPIView):
         serializer.fields.pop('profile_picture', None)
         return serializer
 
+    @swagger_auto_schema(
+        operation_description="Register a new user",
+        manual_parameters=[
+            openapi.Parameter('username', openapi.IN_QUERY, description="Username of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('email', openapi.IN_QUERY, description="Email of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('first_name', openapi.IN_QUERY, description="First name of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('last_name', openapi.IN_QUERY, description="Last name of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('phone', openapi.IN_QUERY, description="Phone number of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user", type=openapi.TYPE_STRING),
+            openapi.Parameter('confirm_password', openapi.IN_QUERY, description="Confirm password of the user", type=openapi.TYPE_STRING)
+        ],
+        responses={
+            201: UserSerializer,
+            400: "Bad Request"
+        }
+    )
     def post(self, request):
         serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
@@ -186,6 +268,17 @@ class UserLogoutView(generics.GenericAPIView):
     serializer_class = LoginSerializer
     permission_classes = [IsAuthenticated]
 
+    @swagger_auto_schema(
+        operation_description="Log out the user",
+        manual_parameters=[
+            openapi.Parameter('refresh_token', openapi.IN_COOKIE, description="Refresh token to log out", type=openapi.TYPE_STRING),
+            openapi.Parameter('access_token', openapi.IN_COOKIE, description="Access token to log out", type=openapi.TYPE_STRING)
+        ],
+        responses={
+            200: "Logged out successfully",
+            401: "Unauthorized"
+        }
+    )
     def post(self, request):
         response = Response({"message": "Logged out successfully"}, status=status.HTTP_200_OK)
         response.delete_cookie('refresh_token')
