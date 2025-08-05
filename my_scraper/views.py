@@ -48,7 +48,6 @@ class UserListView(generics.ListCreateAPIView):
             openapi.Parameter('phone', openapi.IN_QUERY, description="Phone number of the user", type=openapi.TYPE_STRING),
             openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user",
                               type=openapi.TYPE_STRING),
-            openapi.Parameter('confirm_password', openapi.IN_QUERY, description="Confirm password of the user",)
         ],
         responses={
             201: UserSerializer,
@@ -102,7 +101,6 @@ class UserDetailView(generics.RetrieveUpdateDestroyAPIView):
             openapi.Parameter('last_name', openapi.IN_QUERY, description="Last name of the user", type=openapi.TYPE_STRING),
             openapi.Parameter('phone', openapi.IN_QUERY, description="Phone number of the user", type=openapi.TYPE_STRING),
             openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user", type=openapi.TYPE_STRING),
-            openapi.Parameter('confirm_password', openapi.IN_QUERY, description="Confirm password of the user", type=openapi.TYPE_STRING)
         ],
         request_body=UserSerializer,
         responses={
@@ -240,7 +238,6 @@ class UserRegisterView(generics.CreateAPIView):
             openapi.Parameter('last_name', openapi.IN_QUERY, description="Last name of the user", type=openapi.TYPE_STRING),
             openapi.Parameter('phone', openapi.IN_QUERY, description="Phone number of the user", type=openapi.TYPE_STRING),
             openapi.Parameter('password', openapi.IN_QUERY, description="Password of the user", type=openapi.TYPE_STRING),
-            openapi.Parameter('confirm_password', openapi.IN_QUERY, description="Confirm password of the user", type=openapi.TYPE_STRING)
         ],
         responses={
             201: UserSerializer,
