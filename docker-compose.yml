@@ -13,6 +13,7 @@ services:
       - ./static:/app/staticfiles
     networks:
       - web_net
+    restart: always
 
 networks:
   web_net:
