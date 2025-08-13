@@ -33,13 +33,15 @@ class User(AbstractUser):
 
 class IGPage(models.Model):
     username = models.CharField(max_length=150, unique=True)
-    followers = models.IntegerField(default=0)
-    following = models.IntegerField(default=0)
-    posts = models.IntegerField(default=0)
+    ig_user_id = models.CharField(max_length=100, unique=True, null=True, blank=True)
+    followers = models.IntegerField(default=0, null=True, blank=True)
+    following = models.IntegerField(default=0, null=True, blank=True)
+    posts = models.IntegerField(default=0, null=True, blank=True)
     bio = models.TextField(blank=True, null=True)
     profile_picture = models.URLField(blank=True, null=True)
-    date_scraped = models.DateTimeField(auto_now_add=True)
-    token = models.CharField(max_length=255, blank=True, null=True)
+    date_scraped = models.DateTimeField(auto_now_add=True, null=True)
+    access_token = models.CharField(max_length=255, blank=True, null=True)
+    token_expiry = models.DateTimeField(blank=True, null=True)
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='ig_pages')
 
     def __str__(self):

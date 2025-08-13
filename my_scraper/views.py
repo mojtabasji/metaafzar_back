@@ -39,7 +39,7 @@ class UserViewSetApiView(viewsets.ModelViewSet):
 
     @action(
         detail=False,
-        methods=['get', 'post'],
+        methods=['get'],
         permission_classes=[IsAuthenticated]
     )
     def igpages(self, request):
@@ -48,12 +48,20 @@ class UserViewSetApiView(viewsets.ModelViewSet):
             pages = IGPage.objects.filter(user=user)
             serializer = IGPageSerializer(pages, many=True)
             return Response(serializer.data)
-        elif request.method == 'POST':
-            serializer = IGPageSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save(user=user)
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    @action(
+        detail=False,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def add_igpage(self, request):
+        ig_auth_code = request.query_params.get('code').replace('#', '')
+        # ig_auth_code should send to instagram and get access token and user info
+        # then redirect user to front-end view.
+
+        # if not ig_auth_code:
+        #     return Response({"error": "IG auth code is required."}, status=status.HTTP_400_BAD_REQUEST)
+        return Response({"message": "IG auth code received.", "code": ig_auth_code}, status=status.HTTP_200_OK)
 
     @action(
         detail=True,
