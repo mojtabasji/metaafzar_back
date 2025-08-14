@@ -53,8 +53,12 @@ class UserSerializer(serializers.ModelSerializer):
 class IGPageSerializer(serializers.ModelSerializer):
     class Meta:
         model = IGPage
-        fields = ['id', 'username', 'followers', 'following', 'posts', 'bio', 'profile_picture', 'date_scraped', 'token']
+        fields = ['id', 'username', 'ig_user_id', 'followers', 'following', 'posts', 'bio', 'profile_picture', 'date_scraped', 'access_token']
 
     def create(self, validated_data):
         return IGPage.objects.create(**validated_data)
 
+
+class add_igpage_to_user_serializer(serializers.Serializer):
+    code = serializers.CharField(max_length=150, required=True)
+    ig_user_id = serializers.CharField(max_length=100, required=False, allow_blank=True)

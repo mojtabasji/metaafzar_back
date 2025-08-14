@@ -6,10 +6,11 @@ from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
 from my_scraper.models import User, IGPage
-from my_scraper.serializers import UserSerializer, IGPageSerializer
-from rest_framework.decorators import action
+from my_scraper.serializers import UserSerializer, IGPageSerializer, add_igpage_to_user_serializer
+from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import NotFound
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiTypes, OpenApiParameter
+from components import code2token
 
 class UserViewSetApiView(viewsets.ModelViewSet):
     queryset = User.objects.all()
@@ -24,6 +25,8 @@ class UserViewSetApiView(viewsets.ModelViewSet):
     def get_serializer_class(self):
         if self.action == 'igpages':
             return IGPageSerializer
+        if self.action == 'add_igpage':
+            return add_igpage_to_user_serializer
         return super().get_serializer_class()
 
     def create(self, request, *args, **kwargs):
@@ -49,13 +52,29 @@ class UserViewSetApiView(viewsets.ModelViewSet):
             serializer = IGPageSerializer(pages, many=True)
             return Response(serializer.data)
 
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name='code',
+                type=OpenApiTypes.STR,
+                location=OpenApiParameter.QUERY,
+                required=True,
+                description='Instagram authorization code'
+            )
+        ],
+        responses={200: OpenApiTypes.OBJECT}
+    )
     @action(
         detail=False,
         methods=['get'],
         permission_classes=[IsAuthenticated]
     )
-    def add_igpage(self, request):
-        ig_auth_code = request.query_params.get('code').replace('#', '')
+    def add_igpage(self, request, *args, **kwargs):
+        serializer = add_igpage_to_user_serializer(data=request.data)
+        serializer.is_valid(raise_exception=True)
+        # ig_auth_code = request.query_params.get('code').replace('#', '')
+        ig_auth_code = serializer.validated_data.get('code', '').replace('#', '')
+        code2token(ig_auth_code, request.user) # This function should handle the code exchange and return user info or token.
         # ig_auth_code should send to instagram and get access token and user info
         # then redirect user to front-end view.
 

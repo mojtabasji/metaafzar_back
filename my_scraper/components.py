@@ -1,7 +1,11 @@
 from django.urls import path, include, re_path
 from django.http import JsonResponse
 from django.urls import URLResolver, ResolverMatch
+import requests
+import logging
+from django.conf import settings
 
+logger = logging.getLogger(__name__)
 
 def nothing_to_show(request):
     return JsonResponse({"message": "Nothing to show here. Please check the API documentation."}, status=404)
@@ -30,6 +34,26 @@ def endpoints_list(request):
     return JsonResponse({"endpoints": apis_list}, status=200)
 
 
-
+# instagram business login: Exchange the Code For a Token
+def code2token(code, user):
+    logger.info(f"Exchanging code for token for user: {user}")
+    request_url = "https://api.instagram.com/oauth/access_token "
+    payload = {
+        'client_id': settings.my_env.IG_CLIENT_ID,
+        'client_secret': settings.my_env.IG_CLIENT_SECRET,
+        'grant_type': 'authorization_code',
+        'redirect_uri': settings.my_env.IG_REDIRECT_URI,
+        'code': code
+    }
+    logger.debug(f"Payload: {payload}")
+    response = requests.post(request_url, data=payload)
+    logger.debug(f"Response status: {response.status_code}")
+    logger.debug(f"Response data: {response.text}")
+    if response.status_code == 200:
+        logger.info("Token exchange successful")
+        return response.json()
+    else:
+        logger.error(f"Failed to exchange code for token: {response.text}")
+        return {"error": "Failed to exchange code for token", "status_code": response.status_code}
 
 
