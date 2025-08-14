@@ -9,6 +9,8 @@ services:
       - "8880:8080"   # HTTP proxy (if enabled)
     restart: unless-stopped
     command: ["run", "-config=/etc/v2ray/config.json"]
+    networks:
+      - web_net
 
   metaafzar_back_service:
     depends_on:
