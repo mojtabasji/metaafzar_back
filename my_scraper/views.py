@@ -10,7 +10,7 @@ from my_scraper.serializers import UserSerializer, IGPageSerializer, add_igpage_
 from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import NotFound
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiTypes, OpenApiParameter
-from components import code2token
+from my_scraper.components import code2token
 
 class UserViewSetApiView(viewsets.ModelViewSet):
     queryset = User.objects.all()
