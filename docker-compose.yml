@@ -22,8 +22,8 @@ services:
       - .env
 
     environment:
-      HTTP_PROXY: http://v2ray:8880
-      HTTPS_PROXY: http://v2ray:8880
+      HTTP_PROXY: http://v2ray:8080
+      HTTPS_PROXY: http://v2ray:8080
 
     volumes:
       - ./data:/app/data
