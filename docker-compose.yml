@@ -8,6 +8,7 @@ services:
       - "1080:1080"   # SOCKS
       - "8880:8080"   # HTTP proxy (if enabled)
     restart: unless-stopped
+    command: ["run", "-config=/etc/v2ray/config.json"]
 
   metaafzar_back_service:
     depends_on:
