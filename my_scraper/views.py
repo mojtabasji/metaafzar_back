@@ -117,7 +117,7 @@ class UserViewSetApiView(viewsets.ModelViewSet):
 def get_connect_link(request):
     if not request.user.is_authenticated:
         return Response({"error": "Authentication required."}, status=status.HTTP_401_UNAUTHORIZED)
-    oAuth_url = settings.my_env.IG_OAUTH_URL
+    oAuth_url = settings.MY_ENVS.IG_OAUTH_URL
     auth = get_authorization_header(request).decode('utf-8')
     if not auth:
         return Response({"error": "Authorization header is missing."}, status=status.HTTP_400_BAD_REQUEST)

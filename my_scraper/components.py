@@ -40,10 +40,10 @@ def code2token(code, user):
     logger.info(f"Exchanging code for token for user: {user}")
     request_url = "https://api.instagram.com/oauth/access_token "
     payload = {
-        'client_id': settings.my_env.IG_CLIENT_ID,
-        'client_secret': settings.my_env.IG_CLIENT_SECRET,
+        'client_id': settings.MY_ENVS.IG_CLIENT_ID,
+        'client_secret': settings.MY_ENVS.IG_CLIENT_SECRET,
         'grant_type': 'authorization_code',
-        'redirect_uri': settings.my_env.IG_REDIRECT_URI,
+        'redirect_uri': settings.MY_ENVS.IG_REDIRECT_URI,
         'code': code
     }
     logger.debug(f"Payload: {payload}")

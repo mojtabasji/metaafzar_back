@@ -11,7 +11,7 @@ https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
 from pathlib import Path
-from env import my_env
+from env import my_env as MY_ENVS
 from datetime import timedelta
 import os
 
@@ -22,10 +22,10 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = my_env.SECRET_KEY
+SECRET_KEY = MY_ENVS.SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = my_env.DEBUG
+DEBUG = MY_ENVS.DEBUG
 
 if not DEBUG:
     SWAGGER_SETTINGS = {
@@ -54,7 +54,8 @@ LOGGING = {
     },
 }
 
-ALLOWED_HOSTS = my_env.ALLOWED_HOSTS
+SECURE_COOKIES = True if MY_ENVS.ENVIRONMENT == 'production' else False
+ALLOWED_HOSTS = MY_ENVS.ALLOWED_HOSTS
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -82,7 +83,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = my_env.ROOT_URLCONF
+ROOT_URLCONF = MY_ENVS.ROOT_URLCONF
 
 TEMPLATES = [
     {
@@ -104,34 +105,34 @@ WSGI_APPLICATION = 'metaafzar.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 # # Uncomment and configure the following for production database settings
-# if my_env.ENVIRONMENT == 'production':
+# if MY_ENVS.ENVIRONMENT == 'production':
 #     DATABASES = {
 #         'default': {
-#             'ENGINE': my_env.DATABASE_ENGINE,
-#             'NAME': my_env.DATABASE_NAME,
-#             'USER': my_env.DATABASE_USER,
-#             'PASSWORD': my_env.DATABASE_PASSWORD,
-#             'HOST': my_env.DATABASE_HOST,
-#             'PORT': my_env.DATABASE_PORT,
+#             'ENGINE': MY_ENVS.DATABASE_ENGINE,
+#             'NAME': MY_ENVS.DATABASE_NAME,
+#             'USER': MY_ENVS.DATABASE_USER,
+#             'PASSWORD': MY_ENVS.DATABASE_PASSWORD,
+#             'HOST': MY_ENVS.DATABASE_HOST,
+#             'PORT': MY_ENVS.DATABASE_PORT,
 #         }
 #     }
 
-if my_env.DATABASE_ENGINE == 'django.db.backends.sqlite3':
+if MY_ENVS.DATABASE_ENGINE == 'django.db.backends.sqlite3':
     DATABASES = {
         'default': {
-            'ENGINE': my_env.DATABASE_ENGINE,
-            'NAME': BASE_DIR / my_env.DATABASE_NAME,
+            'ENGINE': MY_ENVS.DATABASE_ENGINE,
+            'NAME': BASE_DIR / MY_ENVS.DATABASE_NAME,
         }
     }
 else:
     DATABASES = {
         'default': {
-            'ENGINE': my_env.DATABASE_ENGINE,
-            'NAME': my_env.DATABASE_NAME,
-            'USER': my_env.DATABASE_USER,
-            'PASSWORD': my_env.DATABASE_PASSWORD,
-            'HOST': my_env.DATABASE_HOST,
-            'PORT': my_env.DATABASE_PORT,
+            'ENGINE': MY_ENVS.DATABASE_ENGINE,
+            'NAME': MY_ENVS.DATABASE_NAME,
+            'USER': MY_ENVS.DATABASE_USER,
+            'PASSWORD': MY_ENVS.DATABASE_PASSWORD,
+            'HOST': MY_ENVS.DATABASE_HOST,
+            'PORT': MY_ENVS.DATABASE_PORT,
         }
     }
 

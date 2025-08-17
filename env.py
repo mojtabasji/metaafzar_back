@@ -21,6 +21,7 @@ class Env:
     DATABASE_PASSWORD = os.getenv('DATABASE_PASSWORD', '')
     DATABASE_HOST = os.getenv('DATABASE_HOST', '')
     DATABASE_PORT = os.getenv('DATABASE_PORT', '')
+    IG_OAUTH_URL = os.getenv('IG_OAUTH_URL', 'https://api.instagram.com/oauth/authorize')
 
 
 my_env = Env("development")  # Change to "production" or "staging" as needed
