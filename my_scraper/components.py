@@ -4,6 +4,7 @@ from django.urls import URLResolver, ResolverMatch
 import requests
 import logging
 from django.conf import settings
+from my_scraper.models import User, IGPage
 
 logger = logging.getLogger(__name__)
 
@@ -52,9 +53,20 @@ def code2token(code, user):
     logger.debug(f"Response data: {response.text}")
     if response.status_code == 200:
         logger.info("Token exchange successful")
+        logger.info(f"Response received: {response} - {response.text} - {response.json()}")
+        short_lived_token = response.json().get('access_token')
+        response_long_lived = requests.get("https://graph.instagram.com/access_token", params={
+                                           "grant_type": "ig_exchange_token",
+                                             "client_secret": settings.MY_ENVS.IG_CLIENT_SECRET,
+                                             "access_token": short_lived_token})
+        if response_long_lived.status_code == 200:
+            long_lived_token = response_long_lived.json().get('access_token')
+            token_expiration = response_long_lived.json().get('expires_in')
+            logger.info(f"Long-lived token: {long_lived_token} - expires in {token_expiration} seconds")
         return response.json()
     else:
         logger.error(f"Failed to exchange code for token: {response.text}")
         return {"error": "Failed to exchange code for token", "status_code": response.status_code}
+
 
 
