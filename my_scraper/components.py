@@ -5,6 +5,7 @@ import requests
 import logging
 from django.conf import settings
 from my_scraper.models import User, IGPage
+from my_scraper.IgApp import IgApp
 
 logger = logging.getLogger(__name__)
 
@@ -52,8 +53,8 @@ def code2token(code, user):
     logger.debug(f"Response status: {response.status_code}")
     logger.debug(f"Response data: {response.text}")
     if response.status_code == 200:
-        logger.info("Token exchange successful")
-        logger.info(f"Response received: {response} - {response.text} - {response.json()}")
+        logger.debug("Token exchange successful")
+        logger.debug(f"Response received: {response} - {response.text} - {response.json()}")
         short_lived_token = response.json().get('access_token')
         response_long_lived = requests.get("https://graph.instagram.com/access_token", params={
                                            "grant_type": "ig_exchange_token",
@@ -62,8 +63,26 @@ def code2token(code, user):
         if response_long_lived.status_code == 200:
             long_lived_token = response_long_lived.json().get('access_token')
             token_expiration = response_long_lived.json().get('expires_in')
-            logger.info(f"Long-lived token: {long_lived_token} - expires in {token_expiration} seconds")
-        return response.json()
+            logger.debug(f"Long-lived token: {long_lived_token} - expires in {token_expiration} seconds")
+
+            # add new IGPage to the user
+            ig_page = IGPage.objects.create(
+                user=user,
+                access_token=long_lived_token,
+                token_expiry=token_expiration
+            )
+            logger.info(f"IGPage created for user {user} with token {long_lived_token}")
+            # Update IGPage details
+            if IgApp.update_ig_details(ig_page):
+                logger.info(f"IGPage details updated for user {user}")
+            else:
+                logger.error(f"Failed to update IGPage details for user {user}")
+            return {
+                "access_token": long_lived_token,
+                "expires_in": token_expiration,
+                "ig_page_id": ig_page.id
+            }
+        return {"error": "Failed to get long-lived token", "status_code": response_long_lived.status_code}
     else:
         logger.error(f"Failed to exchange code for token: {response.text}")
         return {"error": "Failed to exchange code for token", "status_code": response.status_code}
