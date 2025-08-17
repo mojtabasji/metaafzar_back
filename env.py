@@ -22,6 +22,10 @@ class Env:
     DATABASE_HOST = os.getenv('DATABASE_HOST', '')
     DATABASE_PORT = os.getenv('DATABASE_PORT', '')
     IG_OAUTH_URL = os.getenv('IG_OAUTH_URL', 'https://api.instagram.com/oauth/authorize')
+    IG_CLIENT_ID = os.getenv('IG_CLIENT_ID', '')
+    IG_CLIENT_SECRET = os.getenv('IG_CLIENT_SECRET', '')
+    IG_REDIRECT_URI = os.getenv('IG_REDIRECT_URI', 'http://localhost:8000/ig/callback')
+
 
 
 my_env = Env("development")  # Change to "production" or "staging" as needed
