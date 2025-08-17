@@ -21,7 +21,7 @@ class UserViewSetApiView(viewsets.ModelViewSet):
 
     # permission class
     def get_permissions(self):
-        if self.action in ['create']:
+        if self.action in ['create', 'add_igpage']:
             return [AllowAny()]
         return [IsAuthenticated()]
 
