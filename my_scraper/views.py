@@ -1,3 +1,4 @@
+import logging
 from django.contrib.auth import authenticate
 from inflection import parameterize
 from django.conf import settings
@@ -73,14 +74,14 @@ class UserViewSetApiView(viewsets.ModelViewSet):
         permission_classes=[AllowAny]
     )
     def add_igpage(self, request, *args, **kwargs):
-        serializer = add_igpage_to_user_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)
+        ig_auth_code = request.query_params.get('code', '').replace('#', '')
+        if not ig_auth_code:
+            return Response({"error": "IG auth code is required."}, status=status.HTTP_400_BAD_REQUEST)
         user_token = request.cookies.get('sessionid')
         if not user_token:
             return Response({"error": "Session ID cookie is missing."}, status=status.HTTP_400_BAD_REQUEST)
-
+        logging.info(f"User token: {user_token}")
         user = authenticate(request, token=user_token)
-        ig_auth_code = serializer.validated_data.get('code', '').replace('#', '')
         code2token(ig_auth_code, user)   # This function should handle the code exchange and return user info
         # ig_auth_code should send to instagram and get access token and user info
         # then redirect user to front-end view.

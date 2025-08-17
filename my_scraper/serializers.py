@@ -60,5 +60,5 @@ class IGPageSerializer(serializers.ModelSerializer):
 
 
 class add_igpage_to_user_serializer(serializers.Serializer):
-    code = serializers.CharField(max_length=150, required=True)
+    code = serializers.CharField(max_length=400, required=True)
     ig_user_id = serializers.CharField(max_length=100, required=False, allow_blank=True)
