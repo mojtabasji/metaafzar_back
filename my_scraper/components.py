@@ -65,12 +65,12 @@ def code2token(code, user):
             long_lived_token = response_long_lived.json().get('access_token')
             token_expiration = response_long_lived.json().get('expires_in')
             logger.debug(f"Long-lived token: {long_lived_token} - expires in {token_expiration} seconds")
-
+            token_expire_on = datetime.now() + timedelta(seconds=token_expiration)
             # add new IGPage to the user
             ig_page = IGPage.objects.create(
                 user=user,
                 access_token=long_lived_token,
-                token_expiry= datetime.now() + timedelta(seconds=token_expiration),
+                token_expiry= token_expire_on.__str__(),
             )
             logger.info(f"IGPage created for user {user} with token {long_lived_token}")
             # Update IGPage details
