@@ -47,5 +47,16 @@ class IGPage(models.Model):
 
     def __str__(self):
         return self.username
+
+    # if on create instance with ig_user_id exists, update it
+    def save(self, *args, **kwargs):
+        if not self.pk and self.ig_user_id:
+            try:
+                existing = IGPage.objects.get(ig_user_id=self.ig_user_id)
+                self.pk = existing.pk  # Update existing instance
+            except IGPage.DoesNotExist:
+                pass  # No existing instance, proceed to create new
+        super().save(*args, **kwargs)
+
     
 

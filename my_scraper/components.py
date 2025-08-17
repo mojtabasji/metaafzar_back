@@ -1,4 +1,5 @@
 from django.urls import path, include, re_path
+from datetime import datetime, timedelta
 from django.http import JsonResponse
 from django.urls import URLResolver, ResolverMatch
 import requests
@@ -69,7 +70,7 @@ def code2token(code, user):
             ig_page = IGPage.objects.create(
                 user=user,
                 access_token=long_lived_token,
-                token_expiry=token_expiration
+                token_expiry= datetime.now() + timedelta(seconds=token_expiration),
             )
             logger.info(f"IGPage created for user {user} with token {long_lived_token}")
             # Update IGPage details
