@@ -70,7 +70,7 @@ class UserViewSetApiView(viewsets.ModelViewSet):
     @action(
         detail=False,
         methods=['get'],
-        permission_classes=[IsAuthenticated]
+        permission_classes=[AllowAny]
     )
     def add_igpage(self, request, *args, **kwargs):
         serializer = add_igpage_to_user_serializer(data=request.data)
