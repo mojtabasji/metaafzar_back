@@ -7,12 +7,13 @@ from django.conf import settings
 
 logger = logging.getLogger(__name__)
 
+
 def nothing_to_show(request):
     return JsonResponse({"message": "Nothing to show here. Please check the API documentation."}, status=404)
 
 
 def endpoints_list(request):
-#     get available endpoints from the django app
+    # get available endpoints from the django app
     apis_list = []
     for urlconf in [include('my_scraper.urls')]:
         if isinstance(urlconf, URLResolver):

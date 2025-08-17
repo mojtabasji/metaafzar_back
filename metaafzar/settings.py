@@ -197,8 +197,10 @@ REST_FRAMEWORK = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Your Project API',
-    'DESCRIPTION': 'Your project description',
+    'TITLE': 'MetaAfzar API Documentation',
+    'DESCRIPTION': 'MetaAfzar is a tool for scraping Instagram business pages and managing user data. This API '
+                   'provides endpoints for user management, Instagram page attachment, and scraping functionalities. '
+                   'This API Developed by ByteCraft.',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
