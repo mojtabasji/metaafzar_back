@@ -4,6 +4,7 @@ from inflection import parameterize
 from django.conf import settings
 from rest_framework import generics, status, viewsets
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.backends import TokenBackend
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.parsers import FormParser, MultiPartParser, JSONParser
 from rest_framework.response import Response
@@ -11,7 +12,7 @@ from my_scraper.models import User, IGPage
 from rest_framework.authentication import get_authorization_header
 from my_scraper.serializers import UserSerializer, IGPageSerializer, add_igpage_to_user_serializer
 from rest_framework.decorators import action, api_view
-from rest_framework.exceptions import NotFound
+from rest_framework.exceptions import NotFound, AuthenticationFailed
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiTypes, OpenApiParameter
 from my_scraper.components import code2token
 
@@ -81,7 +82,15 @@ class UserViewSetApiView(viewsets.ModelViewSet):
         if not user_token:
             return Response({"error": "Session ID cookie is missing."}, status=status.HTTP_400_BAD_REQUEST)
         logging.info(f"User token: {user_token}")
-        user = authenticate(request, token=user_token)
+        token_backend = TokenBackend(algorithm='HS256', signing_key=settings.SECRET_KEY)
+        payload = token_backend.decode(user_token, verify=True)
+
+        # Extract user ID from the payload
+        user_id = payload.get('user_id')
+        if not user_id:
+            raise AuthenticationFailed("Invalid token: user_id not found.")
+
+        user = User.objects.get(id=user_id)
         code2token(ig_auth_code, user)   # This function should handle the code exchange and return user info
         # ig_auth_code should send to instagram and get access token and user info
         # then redirect user to front-end view.
@@ -128,3 +137,31 @@ def get_connect_link(request):
     }, status=status.HTTP_200_OK)
     response.set_cookie('sessionid', user_token, httponly=True, secure=settings.SECURE_COOKIES, samesite='Lax', expires= 60 * 15)  # 15 minutes
     return response
+
+
+@extend_schema(
+    responses={
+        200: OpenApiResponse(
+            description="Testing endpoint response.",
+            response=OpenApiTypes.STR
+        )
+    }
+)
+@api_view(['GET'])
+def testing(request):
+    user_token = request.COOKIES.get('sessionid')
+    if not user_token:
+        return Response({"error": "Session ID cookie is missing."}, status=status.HTTP_400_BAD_REQUEST)
+    logging.info(f"User token: {user_token}")
+    print(f"User token: {user_token}")
+    token_backend = TokenBackend(algorithm='HS256', signing_key=settings.SECRET_KEY)
+    payload = token_backend.decode(user_token, verify=True)
+
+    # Extract user ID from the payload
+    user_id = payload.get('user_id')
+    if not user_id:
+        raise AuthenticationFailed("Invalid token: user_id not found.")
+
+    user = User.objects.get(id=user_id)
+    user = UserSerializer(user).data
+    return Response({"message": "Testing endpoint is working!", "user": user}, status=status.HTTP_200_OK)

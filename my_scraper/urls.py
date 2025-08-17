@@ -17,4 +17,5 @@ urlpatterns = [
     # path('igpages/<int:pk>/', views.IGPageDetailView.as_view(), name='igpage-detail'),
     # path('igpages/<int:pk>/scrape/', views.ScrapeIGPageView.as_view(), name='scrape-igpage'),
     path('users/ig/getconnectlink', views.get_connect_link, name='get-connect-link'),
+    path('testing/', views.testing, name='testing'),
 ]
