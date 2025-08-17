@@ -77,7 +77,7 @@ class UserViewSetApiView(viewsets.ModelViewSet):
         ig_auth_code = request.query_params.get('code', '').replace('#', '')
         if not ig_auth_code:
             return Response({"error": "IG auth code is required."}, status=status.HTTP_400_BAD_REQUEST)
-        user_token = request.cookies.get('sessionid')
+        user_token = request.COOKIES.get('sessionid')
         if not user_token:
             return Response({"error": "Session ID cookie is missing."}, status=status.HTTP_400_BAD_REQUEST)
         logging.info(f"User token: {user_token}")
