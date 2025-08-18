@@ -15,6 +15,7 @@ from rest_framework.decorators import action, api_view
 from rest_framework.exceptions import NotFound, AuthenticationFailed
 from drf_spectacular.utils import extend_schema, OpenApiResponse, OpenApiTypes, OpenApiParameter
 from my_scraper.components import code2token
+from my_scraper.IgApp import IgApp
 
 
 class UserViewSetApiView(viewsets.ModelViewSet):
@@ -28,7 +29,7 @@ class UserViewSetApiView(viewsets.ModelViewSet):
         return [IsAuthenticated()]
 
     def get_serializer_class(self):
-        if self.action == 'igpages':
+        if self.action in ['igpages', 'ig_details', 'ig_media', 'delete_igpage']:
             return IGPageSerializer
         if self.action == 'add_igpage':
             return add_igpage_to_user_serializer
@@ -112,6 +113,57 @@ class UserViewSetApiView(viewsets.ModelViewSet):
         igpage.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
 
+    @extend_schema(
+        responses={
+            200: OpenApiResponse(
+                description="Returns the ig details.",
+                response=UserSerializer
+            ),
+            401: OpenApiResponse(description="Authentication required.")
+        }
+    )
+    @action(
+        detail=True,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def ig_details(self, request, pk=None):
+        user = request.user
+        try:
+            ig_page = IGPage.objects.get(pk=pk, user=user)
+        except IGPage.DoesNotExist:
+            return Response({"error": "IGPage not found or not owned by user."}, status=status.HTTP_404_NOT_FOUND)
+
+        IgApp.update_ig_details(ig_page)
+        serializer = IGPageSerializer(ig_page)
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+    @extend_schema(
+        responses={
+            200: OpenApiResponse(
+                description="Returns the media of the IG page.",
+                response=OpenApiTypes.OBJECT
+            ),
+            401: OpenApiResponse(description="Authentication required."),
+            404: OpenApiResponse(description="IGPage not found or not owned by user.")
+        }
+    )
+    @action(
+        detail=True,
+        methods=['get'],
+        permission_classes=[IsAuthenticated]
+    )
+    def ig_media(self, request, pk=None):
+        try:
+            ig_page = IGPage.objects.get(pk=pk, user=request.user)
+        except IGPage.DoesNotExist:
+            raise NotFound("IGPage not found or not owned by user.")
+
+        media = IgApp.get_ig_media(ig_page)
+        return Response(media, status=status.HTTP_200_OK)
+
+
+
 
 @extend_schema(
     responses={
@@ -135,7 +187,7 @@ def get_connect_link(request):
     response = Response({
         "connect_link": f"{oAuth_url}"
     }, status=status.HTTP_200_OK)
-    response.set_cookie('sessionid', user_token, httponly=True, secure=settings.SECURE_COOKIES, samesite='Lax', expires= 60 * 15)  # 15 minutes
+    response.set_cookie('sessionid', user_token, httponly=True, secure=settings.SECURE_COOKIES, samesite='Lax', expires=60 * 30)  # 30 minutes
     return response
 
 
